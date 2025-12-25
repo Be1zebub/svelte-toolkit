@@ -1,3 +1,6 @@
+// use: actions & classes for drag & drop ui
+// designered as singleton, it means receivers & draggables are force connected (eg no way to create 2 separate d&d without connection)
+
 let dragging = null
 let receivers = []
 let draggables = []
