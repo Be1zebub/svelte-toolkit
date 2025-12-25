@@ -5,19 +5,20 @@ import { writable } from "svelte/store"
 
 const KEY = "__svelte-signal-bus__"
 
-function getBus() {
-	let bus = getContext(KEY)
+function getBus(key) {
+	if (!key) key = KEY
+	let bus = getContext(key)
 
 	if (!bus) {
 		bus = writable({})
-		setContext(KEY, bus)
+		setContext(key, bus)
 	}
 
 	return bus
 }
 
-export function emitSignal(name, data) { // emit event/state
-	const bus = getBus()
+export function emitSignal(name, data, key) { // emit event/state
+	const bus = getBus(key)
 
 	bus.update((events) => {
 		return {
@@ -27,8 +28,8 @@ export function emitSignal(name, data) { // emit event/state
 	})
 }
 
-export function listenSignal(name, callback) { // listen event/state
-	const bus = getBus()
+export function listenSignal(name, callback, key) { // listen event/state
+	const bus = getBus(key)
 	let lastUpdate = 0
 
 	const unsubscribe = bus.subscribe((signals) => {
@@ -45,12 +46,12 @@ export function listenSignal(name, callback) { // listen event/state
 	return unsubscribe
 }
 
-export function subscribeSignal(name) { // for state based signals, subscribe to state value
+export function subscribeSignal(name, key) { // for state based signals, subscribe to state value
 	const data = writable(null)
 
 	listenSignal(name, (signalData) => {
 		data.set(signalData)
-	})
+	}, key)
 
 	return data
 }
