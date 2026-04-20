@@ -2,26 +2,47 @@
 
 let observer = null
 
-export function lazyLoad(node) {
-	if (typeof node.dataset.src !== "string" || node.dataset.lazyLoaded) return
+function ensureObserver() {
+	if (observer) return observer
 
-	if (!observer) {
-		observer = new IntersectionObserver((entries) => {
-			entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					entry.target.src = entry.target.dataset.src
-					entry.target.dataset.lazyLoaded = true
-					observer.unobserve(entry.target)
-				}
-			})
+	observer = new IntersectionObserver((entries) => {
+		entries.forEach((entry) => {
+			if (!entry.isIntersecting) return
+
+			const node = entry.target
+			const nextSrc = node.dataset.src
+			if (typeof nextSrc === "string" && nextSrc.length > 0 && node.src !== nextSrc) {
+				node.src = nextSrc
+			}
+			node.dataset.lazyLoaded = "true"
+			observer.unobserve(node)
 		})
+	}, {
+		rootMargin: "100px",
+	})
+
+	return observer
+}
+
+export function lazyLoad(node, src) {
+	const io = ensureObserver()
+
+	function apply(nextSrc) {
+		if (typeof nextSrc !== "string" || nextSrc.length === 0) return
+		node.dataset.src = nextSrc
+		delete node.dataset.lazyLoaded
+		io.unobserve(node)
+		io.observe(node)
 	}
 
-	observer.observe(node)
+	apply(src || node.dataset.src)
 
 	return {
+		update(nextSrc) {
+			apply(nextSrc)
+		},
 		destroy() {
-			observer.unobserve(node)
+			io.unobserve(node)
 		},
 	}
 }
