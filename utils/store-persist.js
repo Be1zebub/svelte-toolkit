@@ -11,8 +11,9 @@ export default function persistentStore(key, initialValue) {
 }
 
 export function getValue(key, initialValue) {
-	const storedValue = localStorage.getItem(key)
+	const storedValue = localStorage.getItem(`svelte:store-persist:${key}`)
 	if (storedValue === null) return initialValue
+
 	try {
 		return JSON.parse(storedValue)
 	} catch {
@@ -21,5 +22,5 @@ export function getValue(key, initialValue) {
 }
 
 export function setValue(key, value) {
-	localStorage.setItem(key, JSON.stringify(value))
+	localStorage.setItem(`svelte:store-persist:${key}`, JSON.stringify(value))
 }
