@@ -25,7 +25,8 @@
 					onclick={() => {
 						onSortingMethodChange(method.id)
 						close()
-					}}>
+					}}
+				>
 					{method.name}
 				</button>
 			{/each}
