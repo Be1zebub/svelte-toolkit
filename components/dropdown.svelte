@@ -21,15 +21,13 @@
 	{#snippet content(opened, close)}
 		<div class="dropdown-content" class:opened>
 			{#each sortingMethods as method}
-				{#if method.id !== activeSortingMethod.id}
-					<button
-						onclick={() => {
-							onSortingMethodChange(method.id)
-							close()
-						}}>
-						{method.name}
-					</button>
-				{/if}
+				<button
+					onclick={() => {
+						onSortingMethodChange(method.id)
+						close()
+					}}>
+					{method.name}
+				</button>
 			{/each}
 		</div>
 	{/snippet}
